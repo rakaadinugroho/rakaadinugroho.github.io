@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Team Detail</title>
+    <meta name="description" content="Detail Team Spain">
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="css/materialize.min.css" />
+    <link rel="manifest" href="/manifest.json" />
+    <meta name="theme-color" content="#00897B" />
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+</head>
+<body>
+    <nav class="teal lighten-1" role="navigation">
+        <div class="nav-wrapper container">
+            <a href="./index.html" class="sidenav-trigger" data-target="nav-mobile">
+                <i class="material-icons">arrow_back</i>
+            </a>
+            <ul class="topnav right hide-on-med-and-down"></ul>
+            <ul class="sidenav" id="nav-mobile"></ul>
+        </div>
+    </nav>
+
+    <div class="container" id="body-content">
+        <div class="col s12 card-panel lighten-5 z-depth-1">
+            <div class="row">
+                <span class="badge teal white-text" id="founded-profile"></span>
+                <div class="col offset-s4 s4 offset-m5 m2">
+                    <img src="" alt="" class="circle responsive-img" id="thumbnail-profile">
+                </div>
+                <div class="col s12 center-align">
+                    <span class="flow-text" id="team-profile"></span>
+                    <br>
+                    <span class="indigo-text" id="address-profile"></span>
+                    <br>
+                    <div class="chip">
+                        <i class="close material-icons">home</i>
+                        <span class="year-text" id="stadium-profile"></span>
+                    </div>
+                </div>
+            </div>
+            <div class="card-content">
+                <div class="row">
+                    <div class="col s12">
+                        <ul class="tabs">
+                            <li class="tab col s6"><a href="#player-team" class="teal-text">Player</a></li>
+                            <li class="tab col s6"><a href="#matches-team" class="teal-text">Matches</a></li>
+                        </ul>
+                    </div>
+                    <div id="player-team" class="col s12">
+                        <div class="row">
+                            <table class="striped highlight">
+                                <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Position</th>
+                                </tr>
+                                </thead>
+                                <tbody id="squad-profile">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div id="matches-team" class="col s12">
+                        <div class="row">
+                            <table class="responsive-table highlight striped">
+                                <thead>
+                                <tr>
+                                    <th>Home Team</th>
+                                    <th>Away Team</th>
+                                    <th>Time</th>
+                                    <th>Competition</th>
+                                </tr>
+                                </thead>
+                                <tbody id="match-profile">
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="fixed-action-btn">
+        <a class="btn-floating btn-large red" id="save">
+            <i class="large material-icons" id="fav-profile">save</i>
+        </a>
+    </div>
+    <script src="js/materialize.min.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/idb.js"></script>
+    <script src="js/db.js"></script>
+
+    <script>
+        // REGISTER SERVICE WORKER
+        if ("serviceWorker" in navigator) {
+            window.addEventListener("load", function() {
+                navigator.serviceWorker
+                    .register("/service-worker.js")
+                    .then(function() {
+                        console.log("Pendaftaran ServiceWorker berhasil");
+                    })
+                    .catch(function() {
+                        console.log("Pendaftaran ServiceWorker gagal");
+                    });
+            });
+        } else {
+            console.log("ServiceWorker belum didukung browser ini.");
+        }
+
+        document.addEventListener("DOMContentLoaded", function () {
+            /*
+            Tabs
+            */
+            var tabs = document.querySelectorAll('.tabs');
+            for (var i = 0; i < tabs.length; i++){
+                M.Tabs.init(tabs[i]);
+            }
+            /* Button Added */
+            var urlParams = new URLSearchParams(window.location.search);
+            var isFromSaved = urlParams.get("saved");
+
+            var save = document.getElementById("save");
+            if (isFromSaved === "true") {
+                getSavedFavoriteTeamDetail();
+                getSavedFavoriteMatchDetail();
+                document.getElementById("fav-profile").innerText = "remove_circle";
+            } else {
+                document.getElementById("fav-profile").innerText = "save";
+                var item = getTeamById();
+                var itemMatch = getTeamMatchById();
+            }
+
+            save.onclick = function() {
+                if (isFromSaved  === "true") {
+                    /*
+                    Delete from Database
+                    */
+                    deleteSavedFavoriteTeam();
+                } else {
+                    /*
+                    Save Data to Indexed DB
+                     */
+                    item.then(function(profile) {
+                        saveProfileTeam(profile);
+                    });
+
+                    itemMatch.then(function (matches) {
+                        console.log("data to match", matches);
+                        saveMatches(matches, parseInt(urlParams.get("id")));
+                    })
+                }
+            };
+        });
+    </script>
+</body>
+</html>

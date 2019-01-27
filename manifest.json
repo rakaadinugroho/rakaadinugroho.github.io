@@ -1,0 +1,17 @@
+{
+  "name": "Spain League",
+  "gcm_sender_id": "345209725949",
+  "short_name": "Spain Lite",
+  "description": "Spain League",
+  "start_url": "/index.html",
+  "display": "standalone",
+  "background_color": "#00897B",
+  "theme_color": "#00897B",
+  "icons": [
+    {
+      "src": "assets/icon.jpg",
+      "sizes": "512x512",
+      "type": "image/png"
+    }
+  ]
+}
